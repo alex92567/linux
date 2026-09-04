@@ -225,6 +225,19 @@ config INPUT_PM8XXX_VIBRATOR
 	  To compile this driver as module, choose M here: the
 	  module will be called pm8xxx-vibrator.
 
+config INPUT_PM8350B_HAPTICS
+	tristate "Qualcomm PM8350B vibrator support"
+	depends on MFD_SPMI_PMIC
+	select INPUT_FF_MEMLESS
+	help
+	  Say Y here to enable support for the haptics block in the Qualcomm
+	  PM8350B PMIC. The block can drive linear resonant actuators and
+	  eccentric rotating mass motors. The driver exposes direct-play
+	  vibration through the input force-feedback framework.
+
+	  To compile this driver as module, choose M here: the
+	  module will be called pm8350b-haptics.
+
 config INPUT_PMIC8XXX_PWRKEY
 	tristate "PMIC8XXX power key support"
 	depends on MFD_PM8XXX
