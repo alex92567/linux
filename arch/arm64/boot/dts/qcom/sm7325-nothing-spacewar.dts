@@ -998,7 +998,142 @@
 	clock-frequency = <100000>;
 	status = "okay";
 
-	/* awinic,aw21018 (Glyph LED) @ 20 */
+	led-controller@20 {
+		compatible = "awinic,aw21018";
+		reg = <0x20>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		enable-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
+
+		/* PVT calibration converted to the controller's 8-bit current scale. */
+		led@0 {
+			reg = <0>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <0>;
+			led-max-microamp = <7813>;
+		};
+
+		led@1 {
+			reg = <1>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <1>;
+			led-max-microamp = <18594>;
+		};
+
+		led@2 {
+			reg = <2>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <2>;
+			led-max-microamp = <18594>;
+		};
+
+		led@3 {
+			reg = <3>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <3>;
+			led-max-microamp = <18750>;
+		};
+
+		led@4 {
+			reg = <4>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <4>;
+			led-max-microamp = <18750>;
+		};
+
+		led@6 {
+			reg = <6>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <6>;
+			led-max-microamp = <22969>;
+		};
+
+		led@7 {
+			reg = <7>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <7>;
+			led-max-microamp = <625>;
+		};
+
+		led@8 {
+			reg = <8>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <8>;
+			led-max-microamp = <625>;
+		};
+
+		led@9 {
+			reg = <9>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <9>;
+			led-max-microamp = <625>;
+		};
+
+		led@a {
+			reg = <0xa>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <10>;
+			led-max-microamp = <625>;
+		};
+
+		led@b {
+			reg = <0xb>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <11>;
+			led-max-microamp = <625>;
+		};
+
+		led@c {
+			reg = <0xc>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <12>;
+			led-max-microamp = <625>;
+		};
+
+		led@d {
+			reg = <0xd>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <13>;
+			led-max-microamp = <625>;
+		};
+
+		led@e {
+			reg = <0xe>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <14>;
+			led-max-microamp = <625>;
+		};
+
+		led@f {
+			reg = <0xf>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <15>;
+			led-max-microamp = <625>;
+		};
+
+		led@10 {
+			reg = <0x10>;
+			color = <LED_COLOR_ID_WHITE>;
+			function = LED_FUNCTION_INDICATOR;
+			function-enumerator = <16>;
+			led-max-microamp = <4063>;
+		};
+	};
 
 	typec-mux@42 {
 		compatible = "fcs,fsa4480";
