@@ -1,0 +1,85 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/input/qcom,pm8350b-haptics.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Qualcomm PM8350B Haptics
+
+maintainers:
+  - Oleksii Onchul <oleksiionchul@gmail.com>
+
+description:
+  The PM8350B PMIC contains a haptics block for driving linear resonant
+  actuators and eccentric rotating mass motors.
+
+properties:
+  compatible:
+    const: qcom,pm8350b-haptics
+
+  reg:
+    items:
+      - description: Haptics configuration registers
+      - description: Haptics pattern registers
+      - description: Haptics boost registers
+
+  reg-names:
+    items:
+      - const: cfg
+      - const: ptn
+      - const: hboost
+
+  nvmem:
+    description:
+      Phandle to the SDAM region used to pass commands to the PMIC
+      programmable boot sequencer that controls the HBoost supply.
+    maxItems: 1
+
+  nvmem-names:
+    items:
+      - const: hap_cfg_sdam
+
+  qcom,vmax-microvolt:
+    description: Maximum motor drive voltage in microvolts.
+    minimum: 50000
+    maximum: 11000000
+    multipleOf: 50000
+    default: 5000000
+
+  qcom,lra-period-us:
+    description: Open-loop resonant period of the LRA in microseconds.
+    minimum: 5
+    maximum: 20475
+    multipleOf: 5
+
+  qcom,use-erm:
+    type: boolean
+    description: Drive an eccentric rotating mass motor instead of an LRA.
+
+required:
+  - compatible
+  - reg
+  - reg-names
+
+dependencies:
+  nvmem: [nvmem-names]
+  nvmem-names: [nvmem]
+
+additionalProperties: false
+
+examples:
+  - |
+    pmic {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        haptics@f000 {
+            compatible = "qcom,pm8350b-haptics";
+            reg = <0xf000>, <0xf100>, <0xf200>;
+            reg-names = "cfg", "ptn", "hboost";
+            qcom,vmax-microvolt = <5000000>;
+            qcom,lra-period-us = <5880>;
+        };
+    };
+
+...
