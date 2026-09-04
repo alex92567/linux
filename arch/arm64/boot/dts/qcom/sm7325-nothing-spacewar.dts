@@ -1285,6 +1285,20 @@
 	};
 };
 
+&pm8350b {
+	pm8350b_haptics: haptics@f000 {
+		compatible = "qcom,pm8350b-haptics";
+		reg = <0xf000>, <0xf100>, <0xf200>;
+		reg-names = "cfg", "ptn", "hboost";
+		nvmem = <&pmk8350_sdam_46>;
+		nvmem-names = "hap_cfg_sdam";
+
+		qcom,vmax-microvolt = <5000000>;
+		qcom,lra-period-us = <5880>;
+		status = "okay";
+	};
+};
+
 &pmk8350_adc_tm {
 	status = "okay";
 
