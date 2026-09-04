@@ -137,6 +137,18 @@ config LEDS_AW200XX
 	  To compile this driver as a module, choose M here: the module
 	  will be called leds-aw200xx.
 
+config LEDS_AW210XX
+	tristate "LED support for Awinic AW210XX"
+	depends on LEDS_CLASS
+	depends on I2C
+	select REGMAP_I2C
+	help
+	  This option enables support for Awinic AW21009, AW21012 and
+	  AW21018 LED controllers connected through I2C.
+
+	  To compile this driver as a module, choose M here: the module
+	  will be called leds-aw210xx.
+
 config LEDS_AW2013
 	tristate "LED support for Awinic AW2013"
 	depends on LEDS_CLASS && I2C && OF
