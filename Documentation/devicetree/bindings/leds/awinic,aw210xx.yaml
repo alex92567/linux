@@ -1,0 +1,153 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/leds/awinic,aw210xx.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Awinic AW21009, AW21012 and AW21018 LED Controllers
+
+maintainers:
+  - Oleksii Onchul <oleksiionchul@gmail.com>
+
+description: |
+  The AW21009, AW21012 and AW21018 are I2C-connected LED controllers with
+  9, 12 and 18 individually controlled constant-current outputs,
+  respectively.
+
+properties:
+  compatible:
+    enum:
+      - awinic,aw21009
+      - awinic,aw21012
+      - awinic,aw21018
+
+  reg:
+    maxItems: 1
+
+  "#address-cells":
+    const: 1
+
+  "#size-cells":
+    const: 0
+
+  enable-gpios:
+    maxItems: 1
+
+patternProperties:
+  "^led@[0-9a-f]+$":
+    type: object
+    $ref: common.yaml#
+    unevaluatedProperties: false
+
+    properties:
+      reg:
+        description: LED output channel
+        maxItems: 1
+
+      led-max-microamp:
+        description: |
+          Maximum output current for this channel. The driver programs the
+          per-channel scaling register assuming the maximum supported current
+          of 40 mA with the minimum recommended 4 kOhm REXT. A larger REXT
+          results in a lower output current.
+        minimum: 157
+        maximum: 40000
+        default: 16000
+
+      max-brightness:
+        minimum: 1
+        maximum: 255
+
+      default-brightness:
+        maximum: 255
+
+      default-state:
+        enum:
+          - on
+          - off
+
+    required:
+      - reg
+
+allOf:
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: awinic,aw21009
+    then:
+      patternProperties:
+        "^led@[0-9a-f]+$":
+          properties:
+            reg:
+              items:
+                maximum: 8
+
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: awinic,aw21012
+    then:
+      patternProperties:
+        "^led@[0-9a-f]+$":
+          properties:
+            reg:
+              items:
+                maximum: 11
+
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: awinic,aw21018
+    then:
+      patternProperties:
+        "^led@[0-9a-f]+$":
+          properties:
+            reg:
+              items:
+                maximum: 17
+
+required:
+  - compatible
+  - reg
+  - "#address-cells"
+  - "#size-cells"
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/gpio/gpio.h>
+    #include <dt-bindings/leds/common.h>
+
+    i2c {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        led-controller@20 {
+            compatible = "awinic,aw21018";
+            reg = <0x20>;
+            #address-cells = <1>;
+            #size-cells = <0>;
+            enable-gpios = <&gpio 18 GPIO_ACTIVE_HIGH>;
+
+            led@0 {
+                reg = <0>;
+                color = <LED_COLOR_ID_WHITE>;
+                function = LED_FUNCTION_INDICATOR;
+                function-enumerator = <0>;
+                led-max-microamp = <16000>;
+            };
+
+            led@11 {
+                reg = <17>;
+                color = <LED_COLOR_ID_WHITE>;
+                function = LED_FUNCTION_INDICATOR;
+                function-enumerator = <17>;
+            };
+        };
+    };
+
+...
