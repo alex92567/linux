@@ -22,6 +22,7 @@ properties:
       - dongwoon,dw9719
       - dongwoon,dw9761
       - dongwoon,dw9800k
+      - dongwoon,dw9800w
 
   reg:
     maxItems: 1
@@ -43,7 +44,6 @@ properties:
       - 5   # SAC4 mode (operation time# 1.20 x Tvib)
       - 6   # SAC5 mode (operation time# 1.64 x Tvib)
       - 7   # SAC6 mode (operation time# 1.88 x Tvib)
-    default: 4
 
   dongwoon,vcm-prescale:
     description:
@@ -56,6 +56,25 @@ required:
   - vdd-supply
 
 allOf:
+  - if:
+      properties:
+        compatible:
+          const: dongwoon,dw9800w
+    then:
+      properties:
+        dongwoon,sac-mode:
+          description: Value of the mode selection field in register 0x06.
+          enum: [0, 1, 2, 3]
+          default: 1
+        dongwoon,vcm-prescale:
+          description: Value of the SAC timing register (0x07).
+          maximum: 255
+          default: 96
+    else:
+      properties:
+        dongwoon,sac-mode:
+          default: 4
+
   - if:
       properties:
         compatible:

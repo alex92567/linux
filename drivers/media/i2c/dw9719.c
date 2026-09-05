@@ -44,6 +44,7 @@
 
 #define DW9719_INFO			CCI_REG8(0)
 #define DW9719_ID			0xF1
+#define DW9800W_ID			0xF2
 #define DW9761_ID			0xF4
 
 #define DW9719_CONTROL			CCI_REG8(2)
@@ -72,6 +73,8 @@
 #define DW9800K_MODE_SAC_SHIFT		6
 #define DW9800K_DEFAULT_VCM_FREQ		0x10
 
+#define DW9800W_DEFAULT_VCM_FREQ		0x60
+
 #define to_dw9719_device(x) container_of(x, struct dw9719_device, sd)
 
 enum dw9719_model {
@@ -79,6 +82,7 @@ enum dw9719_model {
 	DW9719,
 	DW9761,
 	DW9800K,
+	DW9800W,
 };
 
 struct dw9719_device {
@@ -132,9 +136,11 @@ static int dw9719_power_up(struct dw9719_device *dw9719, bool detect)
 	/* the jiggle is expected to fail, don't even log that as error */
 	fsleep(200);
 	cci_write(dw9719->regmap, reg_pwr, DW9719_STANDBY, &ret);
+	if (ret)
+		goto err_power_down;
 
 	if (detect) {
-		/* These models do not have an INFO register */
+		/* Handle models that do not use automatic model detection. */
 		switch (dw9719->model) {
 		case DW9718S:
 			dw9719->sac_mode = DW9718S_DEFAULT_SAC;
@@ -144,13 +150,26 @@ static int dw9719_power_up(struct dw9719_device *dw9719, bool detect)
 			dw9719->sac_mode = DW9800K_DEFAULT_SAC;
 			dw9719->vcm_freq = DW9800K_DEFAULT_VCM_FREQ;
 			goto props;
+		case DW9800W:
+			ret = cci_read(dw9719->regmap, DW9719_INFO, &val, NULL);
+			if (ret)
+				goto err_power_down;
+			if (val != DW9800W_ID) {
+				dev_err(dw9719->dev,
+					"Unexpected DW9800W device id 0x%02llx\n", val);
+				ret = -ENODEV;
+				goto err_power_down;
+			}
+			dw9719->sac_mode = DW9800K_DEFAULT_SAC;
+			dw9719->vcm_freq = DW9800W_DEFAULT_VCM_FREQ;
+			goto props;
 		default:
 			break;
 		}
 
 		ret = cci_read(dw9719->regmap, DW9719_INFO, &val, NULL);
 		if (ret < 0)
-			return ret;
+			goto err_power_down;
 
 		switch (val) {
 		case DW9719_ID:
@@ -168,7 +187,8 @@ static int dw9719_power_up(struct dw9719_device *dw9719, bool detect)
 		default:
 			dev_err(dw9719->dev,
 				"Error unknown device id 0x%02llx\n", val);
-			return -ENXIO;
+			ret = -ENXIO;
+			goto err_power_down;
 		}
 
 props:
@@ -189,6 +209,7 @@ props:
 
 	switch (dw9719->model) {
 	case DW9800K:
+	case DW9800W:
 		cci_write(dw9719->regmap, DW9719_CONTROL, DW9719_ENABLE_RINGING, &ret);
 		cci_write(dw9719->regmap, DW9719_MODE,
 			  dw9719->sac_mode << DW9800K_MODE_SAC_SHIFT, &ret);
@@ -218,9 +239,11 @@ props:
 		cci_write(dw9719->regmap, DW9719_VCM_FREQ, dw9719->vcm_freq, &ret);
 	}
 
-	if (ret)
-		dw9719_power_down(dw9719);
+	if (!ret)
+		return 0;
 
+err_power_down:
+	dw9719_power_down(dw9719);
 	return ret;
 }
 
@@ -444,6 +467,7 @@ static const struct i2c_device_id dw9719_id_table[] = {
 	{ .name = "dw9719", .driver_data = (kernel_ulong_t)DW9719 },
 	{ .name = "dw9761", .driver_data = (kernel_ulong_t)DW9761 },
 	{ .name = "dw9800k", .driver_data = (kernel_ulong_t)DW9800K },
+	{ .name = "dw9800w", .driver_data = (kernel_ulong_t)DW9800W },
 	{ }
 };
 MODULE_DEVICE_TABLE(i2c, dw9719_id_table);
@@ -453,6 +477,7 @@ static const struct of_device_id dw9719_of_table[] = {
 	{ .compatible = "dongwoon,dw9719", .data = (const void *)DW9719 },
 	{ .compatible = "dongwoon,dw9761", .data = (const void *)DW9761 },
 	{ .compatible = "dongwoon,dw9800k", .data = (const void *)DW9800K },
+	{ .compatible = "dongwoon,dw9800w", .data = (const void *)DW9800W },
 	{ }
 };
 MODULE_DEVICE_TABLE(of, dw9719_of_table);
